@@ -146,6 +146,34 @@ The final Tamil text is shown to the user, ready to copy or use anywhere.
 
 ## 🚀 Getting Started
 
+### ✅ Prerequisites
+
+Before running the project, make sure all required tools and packages are installed. Run these commands to verify:
+
+```bash
+# Check Python version (3.8+ recommended)
+python --version
+
+# Check Tesseract OCR is installed
+tesseract --version
+
+# Check required Python packages
+pip show flask
+pip show pytesseract
+pip show pillow
+pip show opencv-python
+```
+
+> ⚠️ If any package is missing, install it:
+> ```bash
+> pip install flask pytesseract pillow opencv-python easyocr
+> ```
+> For Tesseract OCR installation → [https://github.com/tesseract-ocr/tesseract](https://github.com/tesseract-ocr/tesseract)
+
+---
+
+### ▶️ Run the Project
+
 ```bash
 # Clone the repository
 git clone https://github.com/your-username/tamilaakkam.git
