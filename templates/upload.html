@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>தமிழாக்கம் | படம் OCR</title>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Boxicons for Modern Vector Icons -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body lang="ta">
+    <div class="page-pattern" aria-hidden="true"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo">
+                <i class="bx bx-scan logo-icon"></i>
+                <h1>தமிழா<span>க்கம்</span></h1>
+            </div>
+            <p class="subtitle">எளிதாக படங்களைத் தமிழ் உரையாக மாற்ற Tesseract OCR-ஐ பயன்படுத்தவும்.</p>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="workspace-grid">
+            
+            <!-- Left Panel: Upload and Preview -->
+            <section class="workspace-card" id="uploadCard">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="bx bx-image-add icon-accent"></i>
+                        <h2>படம் பதிவேற்று</h2>
+                    </div>
+                    <span class="badge">JPG, PNG சேமிக்கப்படும்</span>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Drag & Drop Zone -->
+                    <div class="upload-zone" id="dropZone">
+                        <input type="file" id="imageInput" accept=".png, .jpg, .jpeg" hidden>
+                        <div class="upload-prompt" id="uploadPrompt">
+                            <i class="bx bx-cloud-upload upload-icon"></i>
+                            <h3>உங்கள் படத்தை இங்கே இழுத்து விடவும்</h3>
+                            <p>அல்லது <span class="browse-btn">கோப்புகளைத் தேடவும்</span></p>
+                            <span class="file-size-info">அதிகபட்சம் 10 MB</span>
+                        </div>
+                        
+                        <!-- Real-time Image Preview -->
+                        <div class="preview-container hidden" id="previewContainer">
+                            <img src="" alt="Image Preview" id="imagePreview">
+                            <div class="scanner-laser hidden" id="scannerLaser"></div>
+                        </div>
+                    </div>
+
+                    <!-- File Details (Dynamic) -->
+                    <div class="file-details hidden" id="fileDetails">
+                        <div class="file-info">
+                            <i class="bx bx-file file-icon"></i>
+                            <div>
+                                <p class="file-name" id="fileName">image.jpg</p>
+                                <p class="file-size" id="fileSize">0 KB</p>
+                            </div>
+                        </div>
+                        <button class="btn-icon-danger" id="removeBtn" title="கோப்பை அகற்று">
+                            <i class="bx bx-trash"></i>
+                        </button>
+                    </div>
+
+                    <!-- Processing Mode Options -->
+                    <div class="options-container">
+                        <label class="options-label">செயலாக்க முறை</label>
+                        <div class="radio-cards">
+                            <label class="radio-card active" id="modeStandardCard">
+                                <input type="radio" name="ocrMode" value="standard" checked>
+                                <div class="radio-card-content">
+                                    <div class="radio-header">
+                                        <i class="bx bx-text icon-mode"></i>
+                                        <span class="mode-title">சாதாரண OCR</span>
+                                    </div>
+                                    <span class="mode-desc">ஆங்கில/லத்தீன் உரையை நேரடியாகப் படிக்கவும்</span>
+                                </div>
+                            </label>
+                            <label class="radio-card" id="modeTanglishCard">
+                                <input type="radio" name="ocrMode" value="tanglish">
+                                <div class="radio-card-content">
+                                    <div class="radio-header">
+                                        <i class="bx bx-globe-alt icon-mode"></i>
+                                        <span class="mode-title">Tanglish → தமிழ்</span>
+                                    </div>
+                                    <span class="mode-desc">ரோமானிய தமிழ் எழுத்துக்களை தமிழாக்கு</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Action Button -->
+                    <button class="btn-primary" id="extractBtn" disabled>
+                        <span>உரை எடுத்துக்கொள்ளவும்</span>
+                        <i class="bx bx-right-arrow-alt"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Right Panel: Extracted Output -->
+            <section class="workspace-card" id="outputCard">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="bx bx-file-find icon-accent"></i>
+                        <h2>மீட்டெடுத்த உரை</h2>
+                    </div>
+                    <div class="output-stats hidden" id="outputStats">
+                        <span id="charCount">0 எழுத்துகள்</span>
+                        <span class="dot-separator">•</span>
+                        <span id="wordCount">0 வார்த்தைகள்</span>
+                    </div>
+                </div>
+
+                <div class="card-body output-body">
+                    <!-- Editable Textarea -->
+                    <div class="textarea-wrapper">
+                        <textarea id="extractedText" placeholder="மீட்டெடுக்கப்பட்ட உரை இங்கே தோன்றும். தேவையான மாற்றங்களைச் செய்யவும்..." readonly></textarea>
+                        
+                        <!-- Empty State Placeholder -->
+                        <div class="empty-state" id="emptyState">
+                            <i class="bx bx-terminal empty-icon"></i>
+                            <p>இன்னும் உரை எடுக்கப்படவில்லை</p>
+                            <span>படத்தை பதிவேற்று OCR செயல்படுத்தவும்.</span>
+                        </div>
+                    </div>
+
+                    <!-- Output Actions -->
+                    <div class="output-actions">
+                        <button class="btn-secondary" id="copyBtn" disabled>
+                            <i class="bx bx-copy"></i>
+                            <span>உரை நகலெடு</span>
+                        </button>
+                        <button class="btn-secondary btn-translit" id="transliterateBtn" disabled>
+                            <i class="bx bx-transfer-alt"></i>
+                            <span>தமிழாக்கு</span>
+                        </button>
+                        <button class="btn-secondary" id="clearBtn" disabled>
+                            <i class="bx bx-eraser"></i>
+                            <span>வெற்று</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer-bar">
+            <p>Python Flask & Tesseract OCR மூலம் இயக்கப்படுகிறது • நவீன அழகியல் வடிவமைப்பு</p>
+        </footer>
+    </div>
+
+    <!-- Notification Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Script File -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
